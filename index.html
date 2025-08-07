@@ -210,6 +210,254 @@
         min-width: auto;
       }
     }
+    body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f7f9fc;
+  color: #2c3e50;
+  margin: 0;
+  padding: 20px 40px;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.1);
+}
+
+h1 {
+  font-weight: 700;
+  font-size: 2.4rem;
+  margin-bottom: 30px;
+  color: #1a2533;
+  text-align: center;
+}
+
+.top-section {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 28px 32px;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.06);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+}
+
+.card h2 {
+  margin-top: 0;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: #34495e;
+  margin-bottom: 20px;
+}
+
+.table-wrapper {
+  max-height: 320px;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid #d0d7de;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.05);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+thead th {
+  background: #e9f1fc;
+  color: #2b547e;
+  font-weight: 600;
+  padding: 14px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-bottom: 2px solid #aec6e6;
+  text-align: left;
+}
+
+tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e3e8ef;
+  color: #3a4a63;
+}
+
+tbody tr.empty-row td {
+  text-align: center;
+  color: #7a8a9e;
+  font-style: italic;
+}
+
+input[type='number'], input[type='search'] {
+  padding: 10px 14px;
+  border: 1.5px solid #b0bfcf;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #34495e;
+  transition: border-color 0.25s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input[type='number']:focus, input[type='search']:focus {
+  outline: none;
+  border-color: #2980b9;
+  box-shadow: 0 0 8px rgba(41, 128, 185, 0.3);
+}
+
+button {
+  background: #2980b9;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 12px 22px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+
+button:hover, button:focus-visible {
+  background: #1f5d9a;
+  outline: none;
+  box-shadow: 0 0 12px rgba(31, 93, 154, 0.5);
+}
+
+button:active {
+  background: #16476f;
+}
+
+.btn-icon {
+  width: 20px;
+  height: 20px;
+  stroke: white;
+}
+
+.delete-btn {
+  background: #e74c3c;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.delete-btn:hover, .delete-btn:focus-visible {
+  background: #c0392b;
+  outline: none;
+  box-shadow: 0 0 10px rgba(192, 57, 43, 0.5);
+}
+
+#notesSummary {
+  margin-top: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+#changeSection {
+  margin-bottom: 40px;
+  background: #f4f8fc;
+  padding: 28px 32px;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.05);
+}
+
+#changeSection h2 {
+  margin-top: 0;
+  margin-bottom: 22px;
+  color: #34495e;
+  font-weight: 600;
+  font-size: 1.6rem;
+}
+
+#exchangeResult {
+  margin-top: 20px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #27ae60;
+  min-height: 36px;
+}
+
+#exchangeResult.error {
+  color: #e74c3c;
+}
+
+#logsSection {
+  background: #ffffff;
+  padding: 24px 32px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgb(0 0 0 / 0.07);
+}
+
+#logsSection h2 {
+  margin-top: 0;
+  margin-bottom: 18px;
+  color: #34495e;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+#logSearchInput {
+  width: 100%;
+  margin-bottom: 16px;
+  font-size: 1rem;
+  padding: 10px 14px;
+  border: 1.5px solid #b0bfcf;
+  border-radius: 8px;
+  color: #34495e;
+  transition: border-color 0.25s ease;
+}
+
+#logSearchInput:focus {
+  outline: none;
+  border-color: #2980b9;
+  box-shadow: 0 0 8px rgba(41, 128, 185, 0.3);
+}
+
+#logsContainer {
+  background: #f9fbfd;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  height: 280px;
+  overflow-y: auto;
+  padding: 14px 18px;
+  font-family: monospace, monospace;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #34495e;
+  user-select: text;
+  white-space: pre-wrap;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .top-section {
+    flex-direction: column;
+  }
+  .card {
+    min-width: auto;
+    margin-bottom: 32px;
+  }
+  button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
   </style>
 </head>
 <body>
