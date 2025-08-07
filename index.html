@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gullak Shop - Cash Notes Manager with Logs</title>
+  <style>
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f7f9fc;
+      color: #333;
+      margin: 0; padding: 20px;
+      display: flex; justify-content: center;
+    }
+    .container {
+      max-width: 900px;
+      width: 100%;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+      padding: 20px 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #2c3e50;
+    }
+    h2 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.8rem;
+      color: #34495e;
+      font-weight: 600;
+    }
+
+    /* Form Inputs & Buttons */
+    form, .input-group, .buttons-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+    .input-group {
+      flex: 1 1 150px;
+      min-width: 140px;
+      flex-direction: column;
+    }
+    label {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      color: #555;
+    }
+    input[type="number"], input[type="text"] {
+      padding: 8px 10px;
+      font-size: 1rem;
+      border: 1.8px solid #ccc;
+      border-radius: 5px;
+      transition: border-color 0.3s;
+    }
+    input[type="number"]:focus, input[type="text"]:focus {
+      border-color: #2980b9;
+      outline: none;
+      box-shadow: 0 0 6px #2980b9aa;
+    }
+    button {
+      padding: 10px 18px;
+      font-size: 1rem;
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s ease;
+      flex-shrink: 0;
+    }
+    button:disabled {
+      background-color: #7f8c8d;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) {
+      background-color: #1c5980;
+    }
+
+    /* Table */
+    .table-wrapper {
+      max-height: 250px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-top: 0.8rem;
+      box-shadow: inset 0 2px 5px rgb(0 0 0 / 0.03);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 400px;
+    }
+    th, td {
+      text-align: center;
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+      font-weight: 500;
+    }
+    th {
+      background-color: #2980b9;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tbody tr:hover {
+      background-color: #f1faff;
+    }
+    .empty-row td {
+      font-style: italic;
+      color: #999;
+      padding: 20px;
+    }
+
+    /* Summary */
+    #summary {
+      margin-top: 1rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #2c3e50;
+      min-height: 1.5rem;
+    }
+
+    /* Exchange Result */
+    #exchangeResult {
+      margin-top: 1rem;
+      font-size: 1.05rem;
+      line-height: 1.4;
+      min-height: 2rem;
+      border-radius: 5px;
+      padding: 10px 14px;
+    }
+    #exchangeResult.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    #exchangeResult.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    #exchangeResult ul {
+      margin: 8px 0 0 20px;
+      padding: 0;
+    }
+    #exchangeResult li {
+      margin-bottom: 4px;
+    }
+
+    /* Logs Section */
+    #logsSection {
+      border-top: 2px solid #2980b9;
+      padding-top: 1rem;
+    }
+    #logsSection h2 {
+      margin-bottom: 0.6rem;
+    }
+    #logSearchInput {
+      width: 100%;
+      max-width: 400px;
+      padding: 8px 10px;
+      border-radius: 5px;
+      border: 1.8px solid #ccc;
+      font-size: 1rem;
+      margin-bottom: 0.8rem;
+      transition: border-color 0.3s;
+    }
+    #logSearchInput:focus {
+      border-color: #2980b9;
+      outline: none;
+      box-shadow: 0 0 6px #2980b9aa;
+    }
+    #logsContainer {
+      max-height: 220px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #f9f9f9;
+      font-family: monospace;
+      font-size: 0.9rem;
+      padding: 10px;
+      white-space: pre-wrap;
+      line-height: 1.3;
+      color: #444;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 600px) {
+      form, .input-group, .buttons-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      button {
+        width: 100%;
+      }
+      .input-group {
+        min-width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container" role="main" aria-label="Gullak Shop Cash Management with Logs">
+    <h1>Gullak Shop - Cash Notes Manager</h1>
+
+    <!-- Add Notes Section -->
+    <section aria-labelledby="addNotesTitle">
+      <h2 id="addNotesTitle">Add Notes to Gullak</h2>
+      <form id="addNoteForm" aria-describedby="addNotesHelp">
+        <div class="input-group">
+          <label for="noteAmount">Note Amount (₹)</label>
+          <input
+            type="number"
+            id="noteAmount"
+            min="0.01"
+            step="0.01"
+            placeholder="E.g. 100"
+            aria-required="true"
+            autocomplete="off"
+          />
+        </div>
+        <div class="input-group">
+          <label for="noteCount">Number of Notes</label>
+          <input
+            type="number"
+            id="noteCount"
+            min="1"
+            step="1"
+            value="1"
+            aria-required="true"
+            autocomplete="off"
+          />
+        </div>
+        <button id="addNoteBtn" type="submit" disabled>Add Note</button>
+      </form>
+      <div id="addNotesHelp" style="font-size: 0.9rem; color: #666; margin-top: 0.3rem;">
+        Add new cash notes to your gullak. Amount and quantity required.
+      </div>
+
+      <div class="table-wrapper" role="region" aria-label="Current notes in gullak">
+        <table aria-live="polite" aria-relevant="all" aria-describedby="summary">
+          <thead>
+            <tr>
+              <th scope="col">Note Amount (₹)</th>
+              <th scope="col">Quantity</th>
+              <th scope="col">Total (₹)</th>
+            </tr>
+          </thead>
+          <tbody id="notesTableBody">
+            <tr class="empty-row"><td colspan="3">No notes added yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="summary" aria-live="polite" aria-atomic="true" style="margin-top: 0.8rem;">
+        <!-- Summary will appear here -->
+      </div>
+    </section>
+
+    <!-- Change Calculation Section -->
+    <section aria-labelledby="changeSectionTitle" style="margin-top: 2rem;">
+      <h2 id="changeSectionTitle">Calculate Change to Give Back</h2>
+      <form id="changeForm" aria-describedby="changeHelp">
+        <div class="input-group">
+          <label for="purchaseAmount">Purchase Amount (₹)</label>
+          <input
+            type="number"
+            id="purchaseAmount"
+            min="0.01"
+            step="0.01"
+            placeholder="E.g. 700"
+            aria-required="true"
+            autocomplete="off"
+          />
+        </div>
+        <div class="input-group">
+          <label for="amountGiven">Amount Given by Customer (₹)</label>
+          <input
+            type="number"
+            id="amountGiven"
+            min="0.01"
+            step="0.01"
+            placeholder="E.g. 2000"
+            aria-required="true"
+            autocomplete="off"
+          />
+        </div>
+        <div class="buttons-group" style="margin-top: 0.5rem;">
+          <button id="calculateChangeBtn" type="submit" disabled>Calculate Change</button>
+          <button id="giveChangeBtn" type="button" disabled style="display:none;">Give Change</button>
+        </div>
+      </form>
+      <div id="changeHelp" style="font-size: 0.9rem; color: #666; margin-top: 0.3rem;">
+        Enter purchase and customer given amounts. We'll find the notes to return exact change if possible.
+      </div>
+
+      <div id="exchangeResult" aria-live="assertive" aria-atomic="true"></div>
+    </section>
+
+    <!-- Logs Section -->
+    <section id="logsSection" aria-labelledby="logsTitle">
+      <h2 id="logsTitle">Transaction Logs</h2>
+      <input type="text" id="logSearchInput" placeholder="Search logs..." aria-label="Search logs" />
+      <div id="logsContainer" role="log" aria-live="polite" aria-relevant="additions"></div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      // Utility function to round to 2 decimals
+      const roundTo2 = num => Math.round(num * 100) / 100;
+
+      // Local Storage keys
+      const STORAGE_KEYS = {
+        NOTES: 'gullak_notes',
+        LOGS: 'gullak_logs'
+      };
+
+      // Load from localStorage or initialize empty
+      let notes = [];
+      let logs = [];
+
+      // DOM Elements
+      const noteAmountInput = document.getElementById('noteAmount');
+      const noteCountInput = document.getElementById('noteCount');
+      const addNoteBtn = document.getElementById('addNoteBtn');
+      const notesTableBody = document.getElementById('notesTableBody');
+      const summaryEl = document.getElementById('summary');
+
+      const purchaseAmountInput = document.getElementById('purchaseAmount');
+      const amountGivenInput = document.getElementById('amountGiven');
+      const calculateChangeBtn = document.getElementById('calculateChangeBtn');
+      const giveChangeBtn = document.getElementById('giveChangeBtn');
+      const exchangeResultEl = document.getElementById('exchangeResult');
+
+      const logsContainer = document.getElementById('logsContainer');
+      const logSearchInput = document.getElementById('logSearchInput');
+
+      // --- Local Storage Load & Save ---
+      function saveNotes() {
+        localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(notes));
+      }
+      function saveLogs() {
+        localStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(logs));
+      }
+      function loadNotes() {
+        const data = localStorage.getItem(STORAGE_KEYS.NOTES);
+        if(data){
+          try {
+            notes = JSON.parse(data);
+          } catch {
+            notes = [];
+          }
+        }
+      }
+      function loadLogs() {
+        const data = localStorage.getItem(STORAGE_KEYS.LOGS);
+        if(data){
+          try {
+            logs = JSON.parse(data);
+          } catch {
+            logs = [];
+          }
+        }
+      }
+
+      // --- Render Notes Table ---
+      function renderNotesTable() {
+        notesTableBody.innerHTML = '';
+
+        if(notes.length === 0){
+          notesTableBody.innerHTML = '<tr class="empty-row"><td colspan="3">No notes added yet.</td></tr>';
+          summaryEl.textContent = 'Total Notes: 0 | Total Amount: ₹0.00';
+          return;
+        }
+
+        let totalNotes = 0, totalAmount = 0;
+        notes.forEach(({amount, quantity}) => {
+          const totalPerNote = roundTo2(amount * quantity);
+          totalNotes += quantity;
+          totalAmount += totalPerNote;
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>₹${amount.toFixed(2)}</td>
+            <td>${quantity}</td>
+            <td>₹${totalPerNote.toFixed(2)}</td>
+          `;
+          notesTableBody.appendChild(tr);
+        });
+
+        summaryEl.textContent = `Total Notes: ${totalNotes} | Total Amount: ₹${totalAmount.toFixed(2)}`;
+      }
+
+      // --- Add or update notes in gullak ---
+      function addOrUpdateNote(amount, quantity) {
+        const index = notes.findIndex(n => Math.abs(n.amount - amount) < 0.001);
+        if(index === -1){
+          notes.push({ amount, quantity });
+        } else {
+          notes[index].quantity += quantity;
+        }
+        saveNotes();
+      }
+
+      // --- Logs Management ---
+      function addLog(type, message) {
+        const now = new Date();
+        const logEntry = {
+          id: Date.now() + Math.random(), // unique id
+          type,
+          message,
+          timestamp: now.toISOString()
+        };
+        logs.unshift(logEntry); // newest first
+        saveLogs();
+        renderLogs();
+      }
+
+      // --- Render Logs ---
+      function renderLogs(filterText = '') {
+        logsContainer.innerHTML = '';
+        const filter = filterText.toLowerCase();
+
+        if(logs.length === 0){
+          logsContainer.textContent = 'No transaction logs yet.';
+          return;
+        }
+
+        const filteredLogs = logs.filter(log => 
+          log.message.toLowerCase().includes(filter) || log.type.toLowerCase().includes(filter)
+        );
+
+        if(filteredLogs.length === 0){
+          logsContainer.textContent = 'No logs match your search.';
+          return;
+        }
+
+        filteredLogs.forEach(log => {
+          const logTime = new Date(log.timestamp);
+          const timeStr = logTime.toLocaleString();
+          const div = document.createElement('div');
+          div.style.padding = '6px 8px';
+          div.style.borderBottom = '1px solid #ddd';
+          div.style.color = log.type === 'error' ? '#c0392b' : log.type === 'success' ? '#27ae60' : '#34495e';
+          div.innerHTML = `<strong>[${timeStr}] [${log.type.toUpperCase()}]</strong> ${log.message}`;
+          logsContainer.appendChild(div);
+        });
+      }
+
+      // --- Input Validation for Add Note ---
+      function validateAddNoteInputs() {
+        const amount = parseFloat(noteAmountInput.value);
+        const quantity = parseInt(noteCountInput.value);
+        addNoteBtn.disabled = !(amount >= 0.01 && quantity >= 1);
+      }
+
+      // --- Input Validation for Change Calculation ---
+      function validateChangeInputs() {
+        const purchase = parseFloat(purchaseAmountInput.value);
+        const given = parseFloat(amountGivenInput.value);
+        calculateChangeBtn.disabled = !(purchase >= 0.01 && given >= 0.01 && given >= purchase);
+      }
+
+      // Reset change results & buttons
+      function resetChangeResult() {
+        exchangeResultEl.textContent = '';
+        exchangeResultEl.className = '';
+        giveChangeBtn.style.display = 'none';
+        giveChangeBtn.disabled = true;
+      }
+
+      function resetChangeSection() {
+        purchaseAmountInput.value = '';
+        amountGivenInput.value = '';
+        calculateChangeBtn.disabled = true;
+        resetChangeResult();
+      }
+
+      // --- Find exact change combination ---
+      function findChangeCombination(change, notesArray) {
+        const tolerance = 0.01;
+        const sortedNotes = notesArray.slice().sort((a,b) => b.amount - a.amount);
+        const memo = new Map();
+
+        function key(i, rem) {
+          return i + ':' + rem.toFixed(2);
+        }
+
+        function dfs(i, rem) {
+          if(Math.abs(rem) < tolerance) return {};
+          if(rem < -tolerance || i >= sortedNotes.length) return null;
+          const k = key(i, rem);
+          if(memo.has(k)) return memo.get(k);
+
+          const note = sortedNotes[i];
+          for(let count = 0; count <= note.quantity; count++){
+            const newRem = +(rem - count * note.amount).toFixed(2);
+            const res = dfs(i+1, newRem);
+            if(res !== null){
+              const result = {...res};
+              if(count > 0){
+                result[note.amount.toFixed(2)] = count;
+              }
+              memo.set(k, result);
+              return result;
+            }
+          }
+          memo.set(k, null);
+          return null;
+        }
+
+        return dfs(0, change);
+      }
+
+      // --- Show error and success messages ---
+      function showError(msg) {
+        exchangeResultEl.textContent = msg;
+        exchangeResultEl.className = 'error';
+        addLog('error', msg);
+      }
+      function showSuccess(msg) {
+        exchangeResultEl.textContent = msg;
+        exchangeResultEl.className = 'success';
+        addLog('success', msg);
+      }
+
+      // --- Event Listeners ---
+      document.getElementById('addNoteForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const amount = roundTo2(parseFloat(noteAmountInput.value));
+        const quantity = parseInt(noteCountInput.value);
+        if(amount >= 0.01 && quantity >= 1){
+          addOrUpdateNote(amount, quantity);
+          renderNotesTable();
+          noteAmountInput.value = '';
+          noteCountInput.value = '1';
+          addNoteBtn.disabled = true;
+          resetChangeSection();
+
+          addLog('info', `Added ${quantity} note(s) of ₹${amount.toFixed(2)} to gullak.`);
+        }
+      });
+
+      noteAmountInput.addEventListener('input', validateAddNoteInputs);
+      noteCountInput.addEventListener('input', validateAddNoteInputs);
+
+      purchaseAmountInput.addEventListener('input', () => {
+        validateChangeInputs();
+        resetChangeResult();
+      });
+      amountGivenInput.addEventListener('input', () => {
+        validateChangeInputs();
+        resetChangeResult();
+      });
+
+      document.getElementById('changeForm').addEventListener('submit', e => {
+        e.preventDefault();
+        resetChangeResult();
+
+        const purchase = roundTo2(parseFloat(purchaseAmountInput.value));
+        const given = roundTo2(parseFloat(amountGivenInput.value));
+        if(isNaN(purchase) || isNaN(given)){
+          showError('Please enter valid numbers.');
+          return;
+        }
+        if(given < purchase){
+          showError('Amount given by customer is less than purchase amount.');
+          return;
+        }
+        const change = roundTo2(given - purchase);
+        if(change === 0){
+          showSuccess('No change to give back.');
+          return;
+        }
+        if(notes.length === 0){
+          showError('Gullak is empty. Cannot give change.');
+          return;
+        }
+
+        const combo = findChangeCombination(change, notes);
+        if(combo === null){
+          showError(`Cannot give exact change of ₹${change.toFixed(2)} with current notes in gullak.`);
+          return;
+        }
+
+        showSuccess(`Change to give back: ₹${change.toFixed(2)}. Notes:`);
+        const ul = document.createElement('ul');
+        Object.entries(combo).sort((a,b) => parseFloat(b[0]) - parseFloat(a[0])).forEach(([amt, qty]) => {
+          const li = document.createElement('li');
+          li.textContent = `₹${amt} x ${qty}`;
+          ul.appendChild(li);
+        });
+        exchangeResultEl.appendChild(ul);
+
+        giveChangeBtn.disabled = false;
+        giveChangeBtn.style.display = 'inline-block';
+        giveChangeBtn.dataset.change = change;
+        giveChangeBtn.dataset.combo = JSON.stringify(combo);
+      });
+
+      giveChangeBtn.addEventListener('click', () => {
+        const comboStr = giveChangeBtn.dataset.combo;
+        if(!comboStr) return;
+        const combo = JSON.parse(comboStr);
+
+        for(const [amtStr, qty] of Object.entries(combo)){
+          const amount = parseFloat(amtStr);
+          const index = notes.findIndex(n => Math.abs(n.amount - amount) < 0.001);
+          if(index !== -1){
+            notes[index].quantity -= qty;
+            if(notes[index].quantity <= 0){
+              notes.splice(index, 1);
+            }
+          }
+        }
+
+        saveNotes();
+        renderNotesTable();
+        resetChangeSection();
+
+        const change = giveChangeBtn.dataset.change || '';
+        showSuccess(`Change of ₹${change} given and deducted from gullak successfully.`);
+        addLog('info', `Gave change ₹${change} deducted from gullak using notes: ${giveChangeBtn.dataset.combo}`);
+
+        giveChangeBtn.style.display = 'none';
+        giveChangeBtn.disabled = true;
+      });
+
+      // Log search filtering
+      logSearchInput.addEventListener('input', () => {
+        const searchTerm = logSearchInput.value.trim();
+        renderLogs(searchTerm);
+      });
+
+      // --- Initial Load ---
+      loadNotes();
+      loadLogs();
+      renderNotesTable();
+      renderLogs();
+      validateAddNoteInputs();
+      validateChangeInputs();
+    })();
+  </script>
+</body>
+</html>
